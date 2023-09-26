@@ -1,0 +1,51 @@
+name: Up Merge or Create PR
+
+on:
+  pull_request_target:
+    branches: [ 'beta', 'stable' ]
+    types:
+      - closed
+
+permissions:
+  contents: 'write'
+  id-token: 'write'
+  pull-requests: 'write'
+  
+jobs:
+  up-merge:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%d')"
+        
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Parent branch is beta
+        if: github.base_ref == 'stable'
+        run: echo "parent_branch=beta" >> $GITHUB_ENV
+      - name: Parent branch is master
+        if: github.base_ref == 'beta'
+        run: echo "parent_branch=master" >> $GITHUB_ENV
+        
+      - name: Up Merge
+        id: up_merge
+        uses: tczimer/merge-or-pr@main
+        with:
+          target_branch: ${{ env.parent_branch }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          merge_branch_name: resolve_${{ github.base_ref }}_to_${{ env.parent_branch }}_${{ steps.date.outputs.date }}_${{ github.run_id }}_${{ github.run_attempt }}
+          pr_title: Resolve ${{ github.base_ref }} to ${{ env.parent_branch }} ${{ steps.date.outputs.date }} ${{ github.run_attempt }}
+          pr_asignee: ${{ github.event.pull_request.user.login }}
+
+      - name: Up Merge To Master
+        if: ${{ steps.up_merge.outputs.PR_CREATED }} == false && ${{ env.parent_branch }} == 'beta'
+        uses: tczimer/merge-or-pr@main
+        with:
+          target_branch: master
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          merge_branch_name: resolve_beta_to_master_${{ steps.date.outputs.date }}_${{ github.run_id }}_${{ github.run_attempt }}
+          pr_title: Resolve beta to master ${{ steps.date.outputs.date }} ${{ github.run_attempt }}
+          pr_asignee: ${{ github.event.pull_request.user.login }}
