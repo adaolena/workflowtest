@@ -32,7 +32,7 @@ jobs:
         
       - name: Up Merge
         id: up_merge
-        uses: tczimer/merge-or-pr@main
+        uses: adaoleba/merge-or-pr@main
         with:
           target_branch: ${{ env.parent_branch }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
