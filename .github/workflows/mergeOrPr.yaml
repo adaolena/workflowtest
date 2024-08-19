@@ -40,7 +40,6 @@ jobs:
           merge_branch_name: resolve_${{ github.base_ref }}_to_${{ env.parent_branch }}_${{ steps.date.outputs.date }}_${{ github.run_id }}_${{ github.run_attempt }}
           pr_title: Resolve ${{ github.base_ref }} to ${{ env.parent_branch }} ${{ steps.date.outputs.date }} ${{ github.run_attempt }}
           pr_asignee: ${{ github.event.pull_request.user.login }}
-           - name: auto merge
         
       - name: auto merge  
         id: automerge
