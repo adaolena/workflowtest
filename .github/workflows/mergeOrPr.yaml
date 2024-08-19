@@ -15,8 +15,7 @@ jobs:
   up-merge:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    outputs:
-      prurl: ${{ steps.up_merge.outputs.PR_URL }}
+
     steps:
       - name: Get current date
         id: date
@@ -41,16 +40,14 @@ jobs:
           merge_branch_name: resolve_${{ github.base_ref }}_to_${{ env.parent_branch }}_${{ steps.date.outputs.date }}_${{ github.run_id }}_${{ github.run_attempt }}
           pr_title: Resolve ${{ github.base_ref }} to ${{ env.parent_branch }} ${{ steps.date.outputs.date }} ${{ github.run_attempt }}
           pr_asignee: ${{ github.event.pull_request.user.login }}
-
-  auto-merge:
-    needs: up-merge
-    runs-on: ubuntu-latest
-    steps:
-      - name: auto merge
+           - name: auto merge
+        
+      - name: auto merge  
         id: automerge
         env:
-          PR_URL: ${{needs.up-merge.outputs.PR_URL}}
+          PR_URL: ${{steps.up-merge.outputs.PR_URL}}
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: gh pr merge --auto --merge "$PR_URL"
+
 
           
