@@ -47,10 +47,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: auto merge
-      id: automerge
-      env:
+        id: automerge
+        env:
           PR_URL: ${{needs.up-merge.outputs.PR_URL}}
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      run: gh pr merge --auto --merge "$PR_URL"
+        run: gh pr merge --auto --merge "$PR_URL"
 
           
