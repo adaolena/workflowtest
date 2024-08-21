@@ -44,13 +44,21 @@ jobs:
       - name: echo pr url
         id: echoperurl
         env:
-          PR_URL: ${{steps.up-merge.outputs.PR_URL}}
+          PR_URL: ${{steps.up_merge.outputs.PR_URL}}
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: echo "$PR_URL"  
+      - name: auto approve 
+        id: approve
+        if: steps.up_merge.outputs.PR_MERGEABLE == true
+        env:
+          PR_URL: ${{steps.up_merge.outputs.PR_URL}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        run: gh pr review --approve "$PR_URL"
       - name: auto merge  
         id: automerge
+        if: steps.up_merge.outputs.PR_MERGEABLE == true
         env:
-          PR_URL: ${{steps.up-merge.outputs.PR_URL}}
+          PR_URL: ${{steps.up_merge.outputs.PR_URL}}
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: gh pr merge --auto --merge "$PR_URL"
 
